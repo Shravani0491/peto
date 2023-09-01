@@ -4,38 +4,35 @@
 
 session_start();
 
-if(isset($_POST['submit'])){
+$user_id = $_SESSION['user_id'];
 
+if(!isset($user_id)){
+   header('location:login.php');
+};
+
+if(isset($_POST['send'])){
+
+   $name = $_POST['name'];
+   $name = filter_var($name, FILTER_SANITIZE_STRING);
    $email = $_POST['email'];
    $email = filter_var($email, FILTER_SANITIZE_STRING);
-   $pass = md5($_POST['pass']);
-   $pass = filter_var($pass, FILTER_SANITIZE_STRING);
+   $number = $_POST['number'];
+   $number = filter_var($number, FILTER_SANITIZE_STRING);
+   $msg = $_POST['msg'];
+   $msg = filter_var($msg, FILTER_SANITIZE_STRING);
 
-   $sql = "SELECT * FROM `users` WHERE email = ? AND password = ?";
-   $stmt = $conn->prepare($sql);
-   $stmt->execute([$email, $pass]);
-   $rowCount = $stmt->rowCount();  
+   $select_message = $conn->prepare("SELECT * FROM `message` WHERE name = ? AND email = ? AND number = ? AND message = ?");
+   $select_message->execute([$name, $email, $number, $msg]);
 
-   $row = $stmt->fetch(PDO::FETCH_ASSOC);
-
-   if($rowCount > 0){
-
-      if($row['user_type'] == 'admin'){
-
-         $_SESSION['admin_id'] = $row['id'];
-         header('location:admin_page.php');
-
-      }elseif($row['user_type'] == 'user'){
-
-         $_SESSION['user_id'] = $row['id'];
-         header('location:home.php');
-
-      }else{
-         $message[] = 'no user found!';
-      }
-
+   if($select_message->rowCount() > 0){
+      $message[] = 'already sent message!';
    }else{
-      $message[] = 'incorrect email or password!';
+
+      $insert_message = $conn->prepare("INSERT INTO `message`(user_id, name, email, number, message) VALUES(?,?,?,?,?)");
+      $insert_message->execute([$user_id, $name, $email, $number, $msg]);
+
+      $message[] = 'sent message successfully!';
+
    }
 
 }
@@ -48,15 +45,779 @@ if(isset($_POST['submit'])){
    <meta charset="UTF-8">
    <meta http-equiv="X-UA-Compatible" content="IE=edge">
    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   <title>login</title>
+   <title>contact</title>
 
    <!-- font awesome cdn link  -->
    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
 
    <!-- custom css file link  -->
-<style>
+   <link rel="stylesheet" href="css/style.css">
 
-   
+   <style>
+
+.home-bg{
+   background: url(../images/home-bg.jpg) no-repeat;
+   background-size: cover;
+   background-position: center;
+}
+
+.home-bg .home{
+   display: flex;
+   align-items: center;
+   min-height: 60vh;
+}
+
+.home-bg .home .content{
+   width: 50rem;
+}
+
+.home-bg .home .content span{
+   color:var(--orange);
+   font-size: 2.5rem;
+}
+
+.home-bg .home .content h3{
+   font-size: 3rem;
+   text-transform: uppercase;
+   margin-top: 1.5rem;
+   color:var(--black);
+}
+
+.home-bg .home .content p{
+   font-size: 1.6rem;
+   padding:1rem 0;
+   line-height: 2;
+   color:var(--light-color);
+}
+
+.home-bg .home .content a{
+   display: inline-block;
+   width: auto;
+}
+
+.home-category .box-container{
+   display: grid;
+   grid-template-columns: repeat(auto-fit, 27rem);
+   gap:1.5rem;
+   justify-content: center;
+   align-items: flex-start;
+}
+
+.home-category .box-container .box{
+   padding:2rem;
+   text-align: center;
+   border:var(--border);
+   background-color: var(--white);
+   box-shadow: var(--box-shadow);
+   border-radius: .5rem;
+}
+
+.home-category .box-container .box img{
+   width: 100%;
+   margin-bottom: 1rem;
+}
+
+.home-category .box-container .box h3{
+   text-transform: uppercase;
+   color:var(--black);
+   padding:1rem 0;
+   font-size: 2rem;
+}
+
+.home-category .box-container .box p{
+   line-height: 2;
+   font-size: 1.5rem;
+   color:var(--light-color);
+   padding:.5rem 0;
+}
+
+.home-category{
+   padding-bottom: 0;
+}
+
+.products .box-container{
+   display: grid;
+   grid-template-columns: repeat(auto-fit, 35rem);
+   gap:1.5rem;
+   justify-content: center;
+   align-items: flex-start;
+}
+
+.products .box-container .box{
+   padding:2rem;
+   text-align: center;
+   border:var(--border);
+   background-color: var(--white);
+   box-shadow: var(--box-shadow);
+   border-radius: .5rem;
+   position: relative;
+}
+
+.products .box-container .box .price{
+   position: absolute;
+   top:1rem; left:1rem;
+   padding:1rem;
+   border-radius: .5rem;
+   background-color: var(--red);
+   font-size: 1.8rem;
+   color:var(--white);
+}
+
+.products .box-container .box .price span{
+   font-size: 2.5rem;
+   color:var(--white);
+   margin:0 .2rem;
+}
+
+.products .box-container .box .fa-eye{
+   position: absolute;
+   top:1rem; right:1rem;
+   border-radius: .5rem;
+   height: 4.5rem;
+   line-height: 4.3rem;
+   width: 5rem;
+   border:var(--border);
+   color:var(--black);
+   font-size: 2rem;
+   background-color: var(--white);
+}
+
+.products .box-container .box .fa-eye:hover{
+   color:var(--white);
+   background-color: var(--black);
+}
+
+.products .box-container .box img{
+   width: 100%;
+   margin-bottom: 1rem;
+}
+
+.products .box-container .box .name{
+   font-size: 2rem;
+   color:var(--black);
+   padding:1rem 0;
+}
+
+.products .box-container .box .qty{
+   margin:.5rem 0;
+   border-radius: .5rem;
+   padding:1.2rem 1.4rem;
+   font-size: 1.8rem;
+   color:var(--black);
+   border:var(--border);
+   width: 100%;
+}
+
+.quick-view .box{
+   max-width: 50rem;
+   padding:2rem;
+   text-align: center;
+   border:var(--border);
+   background-color: var(--white);
+   box-shadow: var(--box-shadow);
+   border-radius: .5rem;
+   position: relative;
+   margin:0 auto;
+}
+
+.quick-view .box img{
+   height: 25rem;
+   margin-bottom: 1rem;
+}
+
+.quick-view .box .price{
+   position: absolute;
+   top:1rem; left:1rem;
+   padding:1rem;
+   border-radius: .5rem;
+   background-color: var(--red);
+   font-size: 1.8rem;
+   color:var(--white);
+}
+
+.quick-view .box .price span{
+   font-size: 2.5rem;
+   color:var(--white);
+   margin:0 .2rem;
+}
+
+.quick-view .box .qty{
+   margin:.5rem 0;
+   border-radius: .5rem;
+   padding:1.2rem 1.4rem;
+   font-size: 1.8rem;
+   color:var(--black);
+   border:var(--border);
+   width: 100%;
+}
+
+.quick-view .box .name{
+   font-size: 2rem;
+   color:var(--black);
+   padding:1rem 0;
+}
+
+.quick-view .box .details{
+   padding:1rem 0;
+   line-height: 2;
+   font-size: 1.5rem;
+   color:var(--light-color);
+}
+
+.p-category{
+   display: grid;
+   grid-template-columns: repeat(auto-fit, minmax(27rem, 1fr));
+   gap:1.5rem;
+   justify-content: center;
+   align-items: flex-start;
+}
+
+.p-category{
+   padding-bottom: 0;
+}
+
+.p-category a{
+   padding:1.5rem;
+   text-align: center;
+   border:var(--border);
+   background-color: var(--white);
+   box-shadow: var(--box-shadow);
+   border-radius: .5rem;
+   font-size: 2rem;
+   text-transform: capitalize;
+   color:var(--black);
+}
+
+.p-category a:hover{
+   background-color: var(--black);
+   color: var(--white);
+}
+
+.about .row{
+   display: flex;
+   flex-wrap: wrap;
+   gap:3rem;
+   align-items: center;
+}
+
+.about .row .box{
+   flex:1 1 40rem;
+   text-align: center;
+}
+
+.about .row .box img{
+   margin-bottom: 2rem;
+   height: 40rem;
+}
+
+.about .row .box h3{
+   padding:1rem 0;
+   font-size: 2.5rem;
+   text-transform: uppercase;
+   color:var(--black);
+}
+
+.about .row .box p{
+   line-height: 2;
+   font-size: 1.5rem;
+   color:var(--light-color);
+   padding:1rem 0;
+}
+
+.about .row .box .btn{
+   display: inline-block;
+   width: auto;
+}
+
+.reviews .box-container{
+   display: grid;
+   grid-template-columns: repeat(auto-fit, minmax(30rem, 1fr));
+   gap:1.5rem;
+   justify-content: center;
+   align-items: flex-start;
+}
+
+.reviews .box-container .box{
+   padding:2rem;
+   text-align: center;
+   border:var(--border);
+   background-color: var(--white);
+   box-shadow: var(--box-shadow);
+   border-radius: .5rem;
+}
+
+.reviews .box-container .box img{
+   height: 10rem;
+   width: 10rem;
+   border-radius: 50%;
+   margin-bottom: 1rem;
+   object-fit: cover;
+}
+
+.reviews .box-container .box p{
+   padding:1rem 0;
+   font-size: 1.6rem;
+   color:var(--light-color);
+   line-height: 2;
+}
+
+.reviews .box-container .box .stars{
+   display: inline-block;
+   padding:1rem;
+   background-color: var(--light-bg);
+   border:var(--border);
+   border-radius: .5rem;
+   margin:.5rem 0;
+}
+
+.reviews .box-container .box .stars i{
+   font-size: 1.7rem;
+   color:var(--orange);
+   margin:0 .3rem;
+}
+
+.reviews .box-container .box h3{
+   margin-top: 1rem;
+   color:var(--black);
+   font-size: 2rem;
+}
+
+.contact form{
+   margin:0 auto;
+   max-width: 50rem;
+   padding:2rem;
+   text-align: center;
+   border:var(--border);
+   background-color: var(--white);
+   box-shadow: var(--box-shadow);
+   border-radius: .5rem;
+   padding-top: 1rem;
+}
+
+.contact form .box{
+   width: 100%;
+   padding:1.2rem 1.4rem;
+   border:var(--border);
+   margin:1rem 0;
+   background-color: var(--light-bg);
+   font-size: 1.8rem;
+   color:var(--black);
+   border-radius: .5rem;
+}
+
+.contact form textarea{
+   height: 15rem;
+   resize: none;
+}
+
+.search-form form{
+   display: flex;
+   gap:1.5rem;
+   align-items: center;
+}
+
+.search-form form .box{
+   width: 100%;
+   padding:1.4rem;
+   border:var(--border);
+   margin:1rem 0;
+   background-color: var(--white);
+   box-shadow: var(--box-shadow);
+   font-size: 2rem;
+   color:var(--black);
+   border-radius: .5rem;
+}
+
+.search-form form .btn{
+   display: inline-block;
+   width: auto;
+   margin-top: 0;
+}
+
+.wishlist .box-container{
+   display: grid;
+   grid-template-columns: repeat(auto-fit, 35rem);
+   gap:1.5rem;
+   justify-content: center;
+   align-items: flex-start;
+}
+
+.wishlist .box-container .box{
+   padding:2rem;
+   text-align: center;
+   border:var(--border);
+   background-color: var(--white);
+   box-shadow: var(--box-shadow);
+   border-radius: .5rem;
+   position: relative;
+}
+
+.wishlist .box-container .box .price{
+   padding:1rem 0;
+   color:var(--red);
+   font-size: 2.5rem;
+}
+
+.wishlist .box-container .box .price span{
+   font-size: 2.5rem;
+   color:var(--white);
+   margin:0 .2rem;
+}
+
+.wishlist .box-container .box .fa-eye{
+   position: absolute;
+   top:1rem; right:1rem;
+   border-radius: .5rem;
+   height: 4.5rem;
+   line-height: 4.3rem;
+   width: 5rem;
+   border:var(--border);
+   color:var(--black);
+   font-size: 2rem;
+   background-color: var(--white);
+}
+
+.wishlist .box-container .box .fa-eye:hover{
+   color:var(--white);
+   background-color: var(--black);
+}
+
+.wishlist .box-container .box .fa-times{
+   position: absolute;
+   top:1rem; left:1rem;
+   border-radius: .5rem;
+   height: 4.5rem;
+   line-height: 4.3rem;
+   width: 5rem;
+   color:var(--white);
+   font-size: 2rem;
+   background-color: var(--red);
+}
+
+.wishlist .box-container .box .fa-times:hover{
+   background-color: var(--black);
+}
+
+.wishlist .box-container .box img{
+   width: 100%;
+   margin-bottom: 1rem;
+}
+
+.wishlist .box-container .box .name{
+   font-size: 2rem;
+   color:var(--black);
+   padding-top: 1rem;
+}
+
+.wishlist .box-container .box .qty{
+   margin:.5rem 0;
+   border-radius: .5rem;
+   padding:1.2rem 1.4rem;
+   font-size: 1.8rem;
+   color:var(--black);
+   border:var(--border);
+   width: 100%;
+}
+
+.wishlist .wishlist-total{
+   max-width: 50rem;
+   margin: 0 auto;
+   margin-top: 2rem;
+   padding:2rem;
+   text-align: center;
+   border:var(--border);
+   background-color: var(--white);
+   box-shadow: var(--box-shadow);
+   border-radius: .5rem;
+}
+
+.wishlist .wishlist-total p{
+   margin-bottom: 2rem;
+   font-size: 2.5rem;
+   color:var(--light-color);
+}
+
+.wishlist .wishlist-total p span{
+   color:var(--red);
+}
+
+.shopping-cart .box-container{
+   display: grid;
+   grid-template-columns: repeat(auto-fit, 35rem);
+   gap:1.5rem;
+   justify-content: center;
+   align-items: flex-start;
+}
+
+.shopping-cart .box-container .box{
+   padding:2rem;
+   text-align: center;
+   border:var(--border);
+   background-color: var(--white);
+   box-shadow: var(--box-shadow);
+   border-radius: .5rem;
+   position: relative;
+}
+
+.shopping-cart .box-container .box .price{
+   padding:1rem 0;
+   color:var(--red);
+   font-size: 2.5rem;
+}
+
+.shopping-cart .box-container .box .price span{
+   font-size: 2.5rem;
+   color:var(--white);
+   margin:0 .2rem;
+}
+
+.shopping-cart .box-container .box .fa-eye{
+   position: absolute;
+   top:1rem; right:1rem;
+   border-radius: .5rem;
+   height: 4.5rem;
+   line-height: 4.3rem;
+   width: 5rem;
+   border:var(--border);
+   color:var(--black);
+   font-size: 2rem;
+   background-color: var(--white);
+}
+
+.shopping-cart .box-container .box .fa-eye:hover{
+   color:var(--white);
+   background-color: var(--black);
+}
+
+.shopping-cart .box-container .box .fa-times{
+   position: absolute;
+   top:1rem; left:1rem;
+   border-radius: .5rem;
+   height: 4.5rem;
+   line-height: 4.3rem;
+   width: 5rem;
+   color:var(--white);
+   font-size: 2rem;
+   background-color: var(--red);
+}
+
+.shopping-cart .box-container .box .fa-times:hover{
+   background-color: var(--black);
+}
+
+.shopping-cart .box-container .box img{
+   width: 100%;
+   margin-bottom: 1rem;
+}
+
+.shopping-cart .box-container .box .name{
+   font-size: 2rem;
+   color:var(--black);
+   padding-top: 1rem;
+}
+
+.shopping-cart .box-container .box .qty{
+   margin-top: 1rem;
+   border-radius: .5rem;
+   padding:1.2rem 1.4rem;
+   font-size: 1.8rem;
+   color:var(--black);
+   border:var(--border);
+   width: 100%;
+}
+
+.shopping-cart .box-container .sub-total{
+   margin-top: 2rem;
+   font-size: 2rem;
+   color:var(--light-color);
+}
+
+.shopping-cart .box-container .sub-total span{
+   color:var(--red);
+}
+
+.shopping-cart .cart-total{
+   max-width: 50rem;
+   margin: 0 auto;
+   margin-top: 2rem;
+   padding:2rem;
+   text-align: center;
+   border:var(--border);
+   background-color: var(--white);
+   box-shadow: var(--box-shadow);
+   border-radius: .5rem;
+}
+
+.shopping-cart .cart-total p{
+   margin-bottom: 2rem;
+   font-size: 2.5rem;
+   color:var(--light-color);
+}
+
+.shopping-cart .cart-total p span{
+   color:var(--red);
+}
+
+.display-orders{
+   text-align: center;
+   padding-bottom: 0;
+}
+
+.display-orders p{
+   display: inline-block;
+   padding:1rem 2rem;
+   margin:1rem .5rem;
+   font-size: 2rem;
+   text-align: center;
+   border:var(--border);
+   background-color: var(--white);
+   box-shadow: var(--box-shadow);
+   border-radius: .5rem;
+}
+
+.display-orders p span{
+   color:var(--red);
+}
+
+.display-orders .grand-total{
+   margin-top: 2rem;
+   font-size: 2.5rem;
+   color:var(--light-color);
+}
+
+.display-orders .grand-total span{
+   color:var(--red);
+}
+
+.checkout-orders form{
+   padding:2rem;
+   border:var(--border);
+   background-color: var(--white);
+   box-shadow: var(--box-shadow);
+   border-radius: .5rem;
+}
+
+.checkout-orders form h3{
+   border-radius: .5rem;
+   background-color: var(--black);
+   color:var(--white);
+   padding:1.5rem 1rem;
+   text-align: center;
+   text-transform: uppercase;
+   margin-bottom: 2rem;
+   font-size: 2.5rem;
+}
+
+.checkout-orders form .flex{
+   display: flex;
+   flex-wrap: wrap;
+   gap:1.5rem;
+   justify-content: space-between;
+}
+
+.checkout-orders form .flex .inputBox{
+   width: 49%;
+}
+
+.checkout-orders form .flex .inputBox .box{
+   width: 100%;
+   border:var(--border);
+   border-radius: .5rem;
+   font-size: 1.8rem;
+   color:var(--black);
+   padding:1.2rem 1.4rem;
+   margin:1rem 0;
+   background-color: var(--light-bg);
+}
+
+.checkout-orders form .flex .inputBox span{
+   font-size: 1.8rem;
+   color:var(--light-color);
+}
+
+.placed-orders .box-container{
+   display: flex;
+   flex-wrap: wrap;
+   gap:1.5rem;
+   align-items: flex-start;
+}
+
+.placed-orders .box-container .box{
+   padding:1rem 2rem;
+   flex:1 1 40rem;
+   border:var(--border);
+   background-color: var(--white);
+   box-shadow: var(--box-shadow);
+   border-radius: .5rem;
+}
+
+.placed-orders .box-container .box p{
+   margin:.5rem 0;
+   line-height: 1.8;
+   font-size: 2rem;
+   color:var(--light-color);
+}
+
+.placed-orders .box-container .box p span{
+   color:var(--green);
+}
+
+
+
+
+
+
+
+
+
+@media (max-width:768px){
+
+   .home-bg{
+      background-position: left;
+   }
+
+   .home-bg .home{
+      justify-content: center;
+      text-align: center;
+   }
+
+   .checkout-orders form .flex .inputBox{
+      width: 100%;
+   }
+
+}
+
+@media (max-width:450px){
+
+   .home-category .box-container{
+      grid-template-columns: 1fr;
+   }
+
+   .products .box-container{
+      grid-template-columns: 1fr;
+   }
+
+   .quick-view .box img{
+      height: auto;
+      width: 100%;
+   }
+
+   .about .row .box img{
+      width: 100%;
+      height: auto;
+   }   
+
+   .shopping-cart .box-container{
+      grid-template-columns: 1fr;
+   }
+
+   .wishlist .box-container{
+      grid-template-columns: 1fr;
+   }
+
+}
+
+
 @import url('https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600&display=swap');
 
 :root{
@@ -99,9 +860,11 @@ if(isset($_POST['submit'])){
 }
 
 body{
-   background-image:url("cat.jpg") ;
-   background-repeat: no-repeat;
-   background-size: 1550px 1000px;
+   background-image: url("admin home.jpg");
+   background-repeat:no-repeat;
+   background-size: 1600px 800px;
+   background-color: var(--light-bg);
+   /* padding-bottom: 6.5rem; */
 }
 
 html{
@@ -225,7 +988,7 @@ section{
    min-height: 100vh;
    display: flex;
    align-items: center;
-   justify-content: right;
+   justify-content: center;
 }
 
 .form-container form{
@@ -417,8 +1180,20 @@ section{
    background-color: var(--light-bg);
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
 .footer{
-   background-color:var(--white);
+   background-color: var(--white);
 }
 
 .footer .box-container{
@@ -533,38 +1308,60 @@ section{
    }
    
 }
-    </style>
 
+</style>
 </head>
 <body>
-
-<?php
-
-if(isset($message)){
-   foreach($message as $message){
-      echo '
-      <div class="message">
-         <span>'.$message.'</span>
-         <i class="fas fa-times" onclick="this.parentElement.remove();"></i>
-      </div>
-      ';
-   }
-}
-
-?>
    
-<section class="form-container">
+<?php include 'header.php'; ?>
+
+<section class="contact">
+
+   <h1 class="title">get in touch</h1>
 
    <form action="" method="POST">
-      <h3>login now</h3>
-      <input type="email" name="email" class="box" placeholder="enter your email" required>
-      <input type="password" name="pass" class="box" placeholder="enter your password" required>
-      <input type="submit" value="login now" class="btn" name="submit">
-      <p>don't have an account? <a href="register.php">register now</a></p>
+      <input type="text" name="name" class="box" required placeholder="enter your name">
+      <input type="email" name="email" class="box" required placeholder="enter your email">
+      <input type="number" name="number" min="0" class="box" required placeholder="enter your number">
+      <textarea name="msg" class="box" required placeholder="enter your message" cols="30" rows="10"></textarea>
+      <input type="submit" value="send message" class="btn" name="send">
    </form>
 
 </section>
 
+
+
+
+
+
+
+
+<?php include 'footer.php'; ?>
+
+<script>
+    newFunction();
+
+function newFunction() {
+   let navbar = document.querySelector('.header .flex .navbar');
+
+   document.querySelector('#menu-btn').onclick = () => {
+      navbar.classList.toggle('active');
+      profile.classList.remove('active');
+   };
+
+   let profile = document.querySelector('.header .flex .profile');
+
+   document.querySelector('#user-btn').onclick = () => {
+      profile.classList.toggle('active');
+      navbar.classList.remove('active');
+   };
+
+   window.onscroll = () => {
+      profile.classList.remove('active');
+      navbar.classList.remove('active');
+   };
+}
+</script>
 
 </body>
 </html>
