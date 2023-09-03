@@ -1,5 +1,18 @@
 <?php
-include 'config.php';
+$host = 'db'; // Replace with your MySQL server hostname or IP address
+$dbname = 'shop_db'; // Replace with your database name
+$username = 'Shaivi'; // Replace with your MySQL username
+$password = 'root'; // Replace with your MySQL password
+session_start();
+try {
+    $conn = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
+    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+    // Your database operations here...
+} catch (PDOException $e) {
+    echo "Connection failed: " . $e->getMessage();
+    // Handle the error gracefully.
+}
 
 if(isset($_POST['submit'])){
 
@@ -36,7 +49,7 @@ if(isset($_POST['submit'])){
             }else{
                move_uploaded_file($image_tmp_name, $image_folder);
                $message[] = 'registered successfully!';
-               header('location:login.php');
+               header('location:index.php');
             }
          }
 

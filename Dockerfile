@@ -1,4 +1,3 @@
-FROM php:7.4-apache
-COPY ./ /var/www/html/
-RUN echo "serverName localhost" >>/etc/apache2/apache2.conf
-EXPOSE 80
+FROM php:8.0-apache
+RUN docker-php-ext-install mysqli pdo pdo_mysql && docker-php-ext-enable mysqli pdo pdo_mysql
+RUN apt-get update && apt-get upgrade -y
