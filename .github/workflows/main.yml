@@ -1,0 +1,53 @@
+name: Publish Docker image
+
+on:
+  push:
+    branches: ['main']
+
+jobs:
+  build_and_deploy:
+    name: Build and Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v3
+
+      - name: Set up XAMPP
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y wget
+          sudo wget https://sourceforge.net/projects/xampp/files/XAMPP%20Linux/8.2.4/xampp-linux-x64-8.2.4-0-installer.run
+          sudo chmod +x xampp-linux-x64-8.2.4-0-installer.run
+          sudo ./xampp-linux-x64-8.2.4-0-installer.run
+          sudo ln -s /opt/lampp/lampp /usr/local/bin/lampp
+
+      - name: Install Composer
+        run: |
+          php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+          php composer-setup.php
+          php -r "unlink('composer-setup.php');"
+          mv composer.phar /usr/local/bin/composer
+
+      - name: Start XAMPP
+        run: sudo lampp start
+
+      - name: Stop XAMPP
+        run: sudo lampp stop
+      
+      - name: Log in to Docker Hub
+        uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9
+        with:
+          username: shravani0491
+          password: "Shravani@1930"
+      
+      - name: Build Docker Image
+        run: docker build -t petto-php-apache-environment -f ./Dockerfile .
+        
+      - name: Tag Docker Image
+        run: docker tag petto-php-apache-environment:latest shravani0491/petto-php-apache-environment:latest
+      
+      - name: Push Docker Image
+        run: docker push shravani0491/petto-php-apache-environment:latest
+
+      - name: Run Docker Container
+        run: docker run -d -p 80:80 shravani0491/petto-php-apache-environment:latest
