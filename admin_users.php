@@ -86,7 +86,7 @@ if(isset($_GET['delete'])){
 }
 
 body{
-   background-color: orange ;
+   background-color: lightblue ;
    background-repeat: no-repeat;
    background-size: 1600px 800px;
 }
