@@ -115,7 +115,7 @@ if(isset($_POST['submit'])){
 body{
    background-image:url("register.png") ;
    background-repeat: no-repeat;
-   background-size: 1800px 1000px;
+   background-size: 1600px 1000px;
 }
 
 html{
