@@ -22,7 +22,7 @@
          <h3>contact info</h3>
          <p> <i class="fas fa-phone"></i> +91 990061734 </p>
          <p> <i class="fas fa-phone"></i> +080-222-3333 </p>
-         <p> <i class="fas fa-envelope"></i> petto@gmail.com </p>
+         <p> <i class="fas fa-envelope"></i> peto@gmail.com </p>
          <p> <i class="fas fa-map-marker-alt"></i> Bangalore,India - 560065 </p>
       </div>
 
