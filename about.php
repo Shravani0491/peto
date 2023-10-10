@@ -1312,7 +1312,7 @@ We started Peto when we realized that we were presented with limited options and
 From only being a pet-parent to running a passionate startup.. We have rediscovered the finest collective of services and products to pamper those forever-friends of ours. As we met more pet parents, we have seen bringing to light a like-minded, co-operative venture. A drive to create a responsible environment for animal-welfare and to find the right balance of intense crazy pet-lovers to responsible pet-parent.
 
 Continuing into the future, we aim at providing Undivided attention towards -having a good, healthy, life -long companionship with our pets and taking that extra step to understand their daily nutritional needs and holistic well being.
-Visualizing a solution to best suit each pet and pet owner, match every lifestyle is a strength of Petto. </p>
+Visualizing a solution to best suit each pet and pet owner, match every lifestyle is a strength of Peto. </p>
         
       </div>
 
