@@ -1306,9 +1306,9 @@ section{
          <img src="images/about-img-1.png" alt="">
          <h3>Why Choose Us?</h3>
          <p>
-We at Petto are committed to provide premium quality products and quality life for your pets. With the best ever new generation of pure, human grade, organic, high-quality diet.
-Petto started as a need of the hour to bring about a change in the view of not just towards our pets, their diet & nutrition but also towards the way we treat them on a deeper level. 
-We started Petto when we realized that we were presented with limited options and void in the market in terms of organic high quality feed,pet care and holistic well being.
+We at Peto are committed to provide premium quality products and quality life for your pets. With the best ever new generation of pure, human grade, organic, high-quality diet.
+Peto started as a need of the hour to bring about a change in the view of not just towards our pets, their diet & nutrition but also towards the way we treat them on a deeper level. 
+We started Peto when we realized that we were presented with limited options and void in the market in terms of organic high quality feed,pet care and holistic well being.
 From only being a pet-parent to running a passionate startup.. We have rediscovered the finest collective of services and products to pamper those forever-friends of ours. As we met more pet parents, we have seen bringing to light a like-minded, co-operative venture. A drive to create a responsible environment for animal-welfare and to find the right balance of intense crazy pet-lovers to responsible pet-parent.
 
 Continuing into the future, we aim at providing Undivided attention towards -having a good, healthy, life -long companionship with our pets and taking that extra step to understand their daily nutritional needs and holistic well being.
@@ -1329,7 +1329,7 @@ Visualizing a solution to best suit each pet and pet owner, match every lifestyl
 
       <div class="box">
          <img src="profile icon.png" alt="">
-         <p>Petto is a wonderful pet item shop, it is my go-to destination for all pet my pet needs. 
+         <p>Peto is a wonderful pet item shop, it is my go-to destination for all pet my pet needs. 
             The shop offers an impressive range of pet accessories including clothing, food, toys, grooming products, and much more.</p>
          <div class="stars">
             <i class="fas fa-star"></i>
